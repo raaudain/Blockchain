@@ -131,6 +131,7 @@ def mine():
     
     block_string = json.dumps(blockchain.last_block, sort_keys=True)
     
+    # If proof valid
     if blockchain.valid_proof(block_string, data["proof"]):
         
         previous_hash = blockchain.hash(blockchain.last_block)
