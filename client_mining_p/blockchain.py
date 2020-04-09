@@ -94,7 +94,7 @@ class Blockchain(object):
         # TODO
         block_string = json.dumps(self.last_block, sort_keys=True)
         proof = 0
-        while self.valid_proof(block_string, proof):
+        while not self.valid_proof(block_string, proof):
             proof += 1
         # return proof
         print("Brute force counter:", proof)
@@ -134,28 +134,28 @@ blockchain = Blockchain()
 def mine():
     
     data = request.get_json()
-    # Run the proof of work algorithm to get the next proof
-    proof = blockchain.proof_of_work(blockchain.last_block)
-    # Forge the new Block by adding it to the chain with the proof
-    previous_hash = blockchain.hash(blockchain.last_block)
-    block = blockchain.new_block(proof, previous_hash)
-    
-    
     
     # Check that proof and id are present
-    if data.proof and data.id: 
-        response = {
-            # TODO: Send a JSON response with the new block
-            "message": "Success",
-            "new_block": block
-        }
-        return jsonify(response), 200
-    
-    else:
+    if not data["proof"] and not data["id"]: 
         response = {
             "message": "Bad Request"
         }
         return jsonify(response), 400
+    
+    print(data["proof"])
+    block_string = json.dumps(blockchain.last_block, sort_keys=True)
+    
+    if blockchain.valid_proof(block_string, data["proof"]):
+        
+        previous_hash = blockchain.hash(blockchain.last_block)
+        
+        block = blockchain.new_block(data["proof"], previous_hash)
+        
+        response = {
+            "message": "New Block Forged",
+            "new_block": block
+        }
+        return jsonify(response), 200
 
 @app.route('/chain', methods=['GET'])
 def full_chain():
