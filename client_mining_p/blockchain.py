@@ -37,7 +37,7 @@ class Blockchain(object):
             "timestamp": time(),
             "transactions": self.current_transactions,
             "proof": proof,
-            "previous_hash": previous_hash or self.hash(self.last_block)
+            "previous_hash": previous_hash or self.hash(self.chain[-1])
         }
 
         # Reset the current list of transactions
@@ -97,6 +97,7 @@ class Blockchain(object):
         while self.valid_proof(block_string, proof):
             proof += 1
         # return proof
+        print("Brute force counter:", proof)
         return proof
 
     @staticmethod
@@ -112,8 +113,8 @@ class Blockchain(object):
         :return: True if the resulting hash is a valid proof, False otherwise
         """
         # TODO
-        guess = f"{block_string}{proof}"
-        guess_hash = hashlib.sha256(guess.encode()).hexdigest()
+        guess = f"{block_string}{proof}".encode()
+        guess_hash = hashlib.sha256(guess).hexdigest()
         
         return guess_hash[:6] == "000000"
         # return True or False
@@ -140,15 +141,14 @@ def mine():
     block = blockchain.new_block(proof, previous_hash)
     
     
+    
     # Check that proof and id are present
-    if "proof" in data and "id" in data:
-
+    if data.proof and data.id: 
         response = {
             # TODO: Send a JSON response with the new block
             "message": "Success",
             "new_block": block
         }
-
         return jsonify(response), 200
     
     else:
@@ -166,6 +166,12 @@ def full_chain():
     }
     return jsonify(response), 200
 
+@app.route("/last_block", methods=["GET"])
+def last_block():
+    response = {
+        "last_block": blockchain.last_block
+    }
+    return jsonify(response), 200
 
 # Run the program on port 5000
 if __name__ == '__main__':
