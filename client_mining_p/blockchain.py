@@ -13,7 +13,7 @@ class Blockchain(object):
         self.chain = []
         self.current_transactions = []
 
-        # Create the genesis block
+        # Create the genesis block - First block of the block chain
         self.new_block(previous_hash=1, proof=100)
 
     def new_block(self, proof, previous_hash=None):
@@ -83,22 +83,7 @@ class Blockchain(object):
     def last_block(self):
         return self.chain[-1]
 
-    def proof_of_work(self, block):
-        """
-        Simple Proof of Work Algorithm
-        Stringify the block and look for a proof.
-        Loop through possibilities, checking each one against `valid_proof`
-        in an effort to find a number that is a valid proof
-        :return: A valid proof for the provided block
-        """
-        # TODO
-        block_string = json.dumps(self.last_block, sort_keys=True)
-        proof = 0
-        while not self.valid_proof(block_string, proof):
-            proof += 1
-        # return proof
-        print("Brute force counter:", proof)
-        return proof
+
 
     @staticmethod
     def valid_proof(block_string, proof):
@@ -142,7 +127,8 @@ def mine():
         }
         return jsonify(response), 400
     
-    print(data["proof"])
+    #print(data["proof"])
+    
     block_string = json.dumps(blockchain.last_block, sort_keys=True)
     
     if blockchain.valid_proof(block_string, data["proof"]):
